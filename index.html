@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Countdown</title>
+<style>
+  :root { --accent: #ff8c42; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+    color: #f2f2f2;
+    background: radial-gradient(120% 120% at 50% 15%, #241a14 0%, #15100c 60%, #0a0807 100%);
+    height: 100vh; overflow: hidden; display: grid; place-items: center; text-align: center;
+  }
+  #label { font-size: 5vw; opacity: .85; font-weight: 500; padding: 0 4vw; }
+  #big { font-size: 26vw; font-weight: 800; line-height: 1; color: var(--accent);
+         font-variant-numeric: tabular-nums; letter-spacing: -.03em; margin: 1vh 0; }
+  #unit { font-size: 6vw; opacity: .7; margin-top: -1vh; }
+  #sub { font-size: 3.6vw; opacity: .6; margin-top: 2.5vh; }
+  #done { font-size: 12vw; font-weight: 800; color: var(--accent); }
+</style>
+</head>
+<body>
+  <div>
+    <div id="label">—</div>
+    <div id="big">--</div>
+    <div id="unit"></div>
+    <div id="sub"></div>
+  </div>
+<script>
+  const qs = new URLSearchParams(location.search);
+  const label = qs.get("label") || "Countdown";
+  const target = qs.get("date");        // ISO: YYYY-MM-DD or full datetime
+  const accent = qs.get("accent");
+  if (accent) document.documentElement.style.setProperty("--accent", accent);
+
+  const el = id => document.getElementById(id);
+  el("label").textContent = label;
+
+  function targetDate() {
+    if (!target) return null;
+    // Date-only -> treat as local midnight of that day.
+    const d = /^\d{4}-\d{2}-\d{2}$/.test(target) ? new Date(target + "T00:00:00") : new Date(target);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function render() {
+    const d = targetDate();
+    if (!d) {
+      el("big").textContent = "—";
+      el("unit").textContent = "";
+      el("sub").textContent = "Set a target date in the widget settings.";
+      return;
+    }
+    const ms = d.getTime() - Date.now();
+    if (ms <= 0) {
+      el("big").innerHTML = `<span id="done">🎉</span>`;
+      el("unit").textContent = "";
+      el("sub").textContent = label + " — it's here!";
+      return;
+    }
+    const totalMin = Math.floor(ms / 60000);
+    const days = Math.floor(totalMin / 1440);
+    const hours = Math.floor((totalMin % 1440) / 60);
+    const mins = totalMin % 60;
+    if (days >= 1) {
+      el("big").textContent = days;
+      el("unit").textContent = days === 1 ? "day to go" : "days to go";
+      el("sub").textContent = `${hours}h ${mins}m · ${d.toLocaleDateString(undefined,
+        { weekday: "long", day: "numeric", month: "long" })}`;
+    } else {
+      el("big").textContent = `${String(hours).padStart(2,"0")}:${String(mins).padStart(2,"0")}`;
+      el("unit").textContent = "hours : minutes";
+      el("sub").textContent = "today";
+    }
+  }
+
+  render();
+  setInterval(render, 30000);
+</script>
+</body>
+</html>

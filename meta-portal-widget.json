@@ -1,0 +1,22 @@
+{
+  "name": "Countdown",
+  "description": "Big days-to-go counter to any date - holidays, trips, birthdays.",
+  "entry": "index.html",
+  "dwellSec": 30,
+  "aspect": "16:9",
+  "category": "Ambient",
+  "author": "GodricTM",
+  "screenshots": ["screenshot.png"],
+  "config": [
+    { "key": "label", "type": "text", "label": "Label", "required": true, "default": "New Year" },
+    { "key": "date", "type": "text", "label": "Target date", "required": true,
+      "help": "YYYY-MM-DD (e.g. 2027-01-01) or a full date-time." },
+    { "key": "accent", "type": "text", "label": "Accent color (hex)", "default": "#ff8c42" }
+  ],
+  "urlParams": {
+    "label": "{label}",
+    "date": "{date}",
+    "accent": "{accent}"
+  },
+  "permissions": []
+}
